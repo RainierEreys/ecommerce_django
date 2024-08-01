@@ -11,17 +11,10 @@ class ProductSerializer(serializers.ModelSerializer):
             'stock',
             ]
 
-class OrderSerializer(serializers.ModelSerializer):
-    order_details = serializers.HyperlinkedRelatedField(many=True, view_name='order-detail', read_only=True)
-    class Meta:
-        model = Order
-        fields = [
-            'id',
-            'date_time',
-            'order_details',
-            ] 
+
         
 class OrderDetailSerializer(serializers.ModelSerializer):
+   
     class Meta:
         model = OrderDetail
         fields = [
@@ -31,7 +24,22 @@ class OrderDetailSerializer(serializers.ModelSerializer):
             'product',
         ]
     
-   
+class OrderSerializer(serializers.ModelSerializer):
+    details = OrderDetailSerializer(many=True)
+    class Meta:
+        model = Order
+        fields = [
+            'id',
+            'date_time',
+            'details',
+            ] 
+        
+    # def get_order_details(self, id):
+    #     order_details = OrderDetail.objects.filter(order=id)
+    #     return OrderDetailSerializer(order_details, many=True).data
+    
+    # def get_total(self):
+    #     order_detail_price = OrderDetail.objects.filter(order=id)   
     
             
         
