@@ -33,6 +33,10 @@ class OrderDetailSerializer(serializers.ModelSerializer):
             'quantity',
             'product',
         ]
+        
+    
+    
+    
     
 class OrderSerializer(serializers.ModelSerializer):
     details = OrderDetailSerializer(many=True)
@@ -44,21 +48,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'details',
             ] 
     
-    def validate(self, data):
-        order = data.get('order')
         
-        registros_mismo_order = OrderDetail.objects.filter(order=order)
-        
-        if registros_mismo_order.exists():
-            print('registros iguales')
-        
-        
-    # def get_order_details(self, id):
-    #     order_details = OrderDetail.objects.filter(order=id)
-    #     return OrderDetailSerializer(order_details, many=True).data
-    
-    # def get_total(self):
-    #     order_detail_price = OrderDetail.objects.filter(order=id)   
     
             
         
