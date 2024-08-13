@@ -36,6 +36,7 @@ class ProductViewSet(viewsets.ModelViewSet):
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+
     
     # valores_vistos = set()
     # valores_repetidos = set()
@@ -65,7 +66,7 @@ class OrderDetailViewSet(viewsets.ModelViewSet):
         stock_product = Product.objects.filter(name=product).first()
         if stock_product:
             if stock_product.stock > quantity:
-                stock_product.stock += quantity
+                stock_product.stock -= quantity
                 stock_product.save()
                 order_detail, created = OrderDetail.objects.get_or_create(
                     order=order,
