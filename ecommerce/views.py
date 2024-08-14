@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.views import APIView
 from django.db.models import Sum
+import requests
 
 from django.contrib.auth.models import User
 
@@ -84,5 +85,15 @@ class OrderDetailViewSet(viewsets.ModelViewSet):
                 return Response({"error":"insuficiente stock"}, status=status.HTTP_400_BAD_REQUEST)
         
     
+class ConsumoApi(APIView):
+    def get(self, request, *args, **kwargs):
+        #hago la solicitud
+        response = requests.get("")
+        
+        if response.status_code == 200:
+            tareas = response.json()
+            return Response(tareas, status=status.HTTP_200_OK)
+        else:
+            return Response({'mensaje':'no se ha logrado la conexion'}, status=status.HTTP_400_BAD_REQUEST)
     
 
