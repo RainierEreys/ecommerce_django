@@ -1,5 +1,5 @@
 from rest_framework.routers import DefaultRouter
-from ecommerce.views import ProductViewSet, OrderViewSet, OrderDetailViewSet, RegisterViewSet
+from ecommerce.views import ProductViewSet, OrderViewSet, OrderDetailViewSet, RegisterViewSet, ConsumoApi
 from django.urls import path, include
 
 router = DefaultRouter()
@@ -13,7 +13,10 @@ urlpatterns = [
     path('', include(router.urls)),
     path('registro/',
         RegisterViewSet.as_view(),
-        name='registro')
+        name='registro'),
+    path('dolita/',
+        ConsumoApi.as_view(),
+        name='dolar')
 ]
 
 

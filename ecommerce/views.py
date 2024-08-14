@@ -88,7 +88,7 @@ class OrderDetailViewSet(viewsets.ModelViewSet):
 class ConsumoApi(APIView):
     def get(self, request, *args, **kwargs):
         #hago la solicitud
-        response = requests.get("")
+        response = requests.get("https://pydolarvenezuela-api.vercel.app/api/v1/dollar?monitor=enparalelovzla")
         
         if response.status_code == 200:
             tareas = response.json()
