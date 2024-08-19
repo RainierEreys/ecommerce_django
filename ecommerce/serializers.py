@@ -54,9 +54,23 @@ class OrderSerializer(serializers.ModelSerializer):
         details = validated_data.pop('details', [])
         order = super().create(validated_data)
         
+        
+        orders_to_create = []
+        for detail in details:
+            product = Product.objects.get(name=detail['product'])
+            print(f'stock: {product.stock} y el quantity es {detail["quantity"]}')
+            
+            if product.stock >= detail['quantity']:
+                product.stock -= detail['quantity']
+                product.save()
+                orders_to_create.append(detail)
+                print(orders_to_create)
+            else:
+                raise ValidationError({'la cantidad del producto: {product} no esta disponible'})
+        
         OrderDetail.objects.bulk_create(
             [
-                OrderDetail(**detail, order=order) for detail in details
+                OrderDetail(**detail, order=order) for detail in orders_to_create
             ]
         )
         

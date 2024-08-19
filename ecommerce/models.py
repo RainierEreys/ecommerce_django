@@ -12,6 +12,8 @@ class Product(models.Model):
 class Order(models.Model):
     date_time = models.DateField(auto_now_add=True)
     
+    
+    
 class OrderDetail(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="details", default=1)
     quantity = models.IntegerField()

@@ -38,7 +38,23 @@ class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        order = self.get_object()
+        orderdetails = OrderDetail.objects.filter(order=order.id)
+        print(orderdetails)
+        
+        for order in orderdetails:
+            products_restore = Product.objects.get(name=order.product)
+            products_restore.stock += order.quantity
+            products_restore.save()
+        
+        orderdetails.delete()    
+        
+        self.perform_destroy(order)
+        return Response(status=status.HTTP_204_NO_CONTENT)
     
+    def perform_destroy(self, instance):
+        instance.delete()
     # valores_vistos = set()
     # valores_repetidos = set()
     
