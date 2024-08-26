@@ -35,20 +35,26 @@ class OrderDetailSerializer(serializers.ModelSerializer):
             'quantity',
             'product',
         ]
-        
-    
-    
-    
-    
+  
 class OrderSerializer(serializers.ModelSerializer):
     details = OrderDetailSerializer(many=True)
+    # total = Order.get_total
+    # total_usd = Order.get_total_usd
     class Meta:
         model = Order
         fields = [
             'id',
             'date_time',
             'details',
+            'get_total',
+            'get_total_usd',
             ] 
+    
+    # def get_total(self, obj):
+    #     return obj.get_total()
+    
+    # def get_total_usd(self, obj):
+    #     return obj.get_total_usd()
     
     def create(self, validated_data):
         details = validated_data.pop('details', [])

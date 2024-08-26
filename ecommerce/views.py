@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.views import APIView
 from django.db.models import Sum
+from django.db import transaction
 import requests
 
 from django.contrib.auth.models import User
@@ -38,32 +39,35 @@ class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
+    def get_total(self):
+        instance = self.get_object()
+        
+
+    @transaction.atomic
     def destroy(self, request, *args, **kwargs):
         order = self.get_object()
-        orderdetails = OrderDetail.objects.filter(order=order.id)
+        orderdetails = OrderDetail.objects.filter(order=order)
         print(orderdetails)
         
-        for order in orderdetails:
-            products_restore = Product.objects.get(name=order.product)
-            products_restore.stock += order.quantity
+        for orderdetail in orderdetails:
+            products_restore = Product.objects.get(name=orderdetail.product)
+            products_restore.stock += orderdetail.quantity
             products_restore.save()
         
         orderdetails.delete()    
-        
+        print(f'holaholahola {order.id}')
         self.perform_destroy(order)
+        
+        if Order.objects.filter(id=order.id).exists():
+            print(f'La orden {order.id} aún existe.')
+        else:
+            print(f'La orden {order.id} ha sido eliminada.')
+            
         return Response(status=status.HTTP_204_NO_CONTENT)
     
     def perform_destroy(self, instance):
         instance.delete()
-    # valores_vistos = set()
-    # valores_repetidos = set()
-    
-    # def list(self, request, *args, **kwargs):
-    #     query = OrderDetail.objects.all()
-    #     for index, datos in enumerate(query):
-    #         if datos.order_
-    #         print(f"{index} {datos.id} {datos.order_id}")
-    #     return Response({})
+        print(f'Orden {instance.id} eliminada en perform_destroy')
     
     
 class OrderDetailViewSet(viewsets.ModelViewSet):
@@ -101,15 +105,16 @@ class OrderDetailViewSet(viewsets.ModelViewSet):
                 return Response({"error":"insuficiente stock"}, status=status.HTTP_400_BAD_REQUEST)
         
     
-class ConsumoApi(APIView):
-    def get(self, request, *args, **kwargs):
-        #hago la solicitud
-        response = requests.get("https://pydolarvenezuela-api.vercel.app/api/v1/dollar?monitor=enparalelovzla")
+# class ConsumoApi(APIView):
+#     def get(self, request, *args, **kwargs):
+#         #hago la solicitud
+#         response = requests.get("https://pydolarve.org/api/v1/dollar?page=enparalelovzla")
         
-        if response.status_code == 200:
-            tareas = response.json()
-            return Response(tareas, status=status.HTTP_200_OK)
-        else:
-            return Response({'mensaje':'no se ha logrado la conexion'}, status=status.HTTP_400_BAD_REQUEST)
+#         if response.status_code == 200:
+#             tareas = response.json()
+#             valor_dolar = tareas['monitors']['enparalelovzla']['price']
+#             return Response(valor_dolar, status=status.HTTP_200_OK)
+#         else:
+#             return Response({'mensaje':'no se ha logrado la conexion'}, status=status.HTTP_400_BAD_REQUEST)
     
 
