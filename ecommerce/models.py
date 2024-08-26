@@ -11,8 +11,8 @@ class ValueDolar(models.Model):
     @classmethod
     def get_or_update_value(cls):
         value_dolar, created = cls.objects.get_or_create(id=1)
-        # fecha_hoy = datetime.now()
-        print(fecha_hoy.date())
+        fecha_hoy = datetime.now()
+        # print(fecha_hoy.date())
         if created or value_dolar.value is None or value_dolar.date_time != fecha_hoy.date():
             # Si se creó o el valor es None, actualiza el valor
             value_dolar.value = getVerdeValue()
