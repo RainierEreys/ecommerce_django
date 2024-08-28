@@ -7,17 +7,28 @@ import requests
 class ValueDolar(models.Model):
     date_time = models.DateField(auto_now_add=True)
     value = models.FloatField(verbose_name='Valor Dolar')
-    
+    _cached_value = None  # Variable de clase para almacenar el valor temporalmente
+
     @classmethod
-    def get_or_update_value(cls):
-        value_dolar, created = cls.objects.get_or_create(id=1)
-        fecha_hoy = datetime.now()
-        # print(fecha_hoy.date())
-        if created or value_dolar.value is None or value_dolar.date_time != fecha_hoy.date():
-            # Si se creó o el valor es None, actualiza el valor
-            value_dolar.value = getVerdeValue()
-            value_dolar.save()
-        return value_dolar.value
+    def create_new_value(cls):
+        valor_monitor = getVerdeValue()
+        return cls.objects.create(value=valor_monitor)
+
+    @classmethod
+    def get_latest_value(cls):
+        print()
+        return cls.objects.latest('date_time').value
+
+    @classmethod
+    def get_or_create_latest_value(cls):
+        if not hasattr(cls, '_cached_value'):
+            print('no sucede')
+            cls.create_new_value()
+            cls._cached_value = cls.get_latest_value()
+        else:
+            print('sucede')
+            cls._cached_value = cls.get_latest_value()
+        return cls._cached_value
     
 class Product(models.Model):
     name = models.CharField(max_length=100)
@@ -38,10 +49,28 @@ class Order(models.Model):
     @property
     def get_total_usd(self):
         try:
-            value_dolar = ValueDolar.get_or_update_value()
-            total_en_bs = self.get_total
-            total_en_usd = total_en_bs * value_dolar
-            return total_en_usd
+            #consulto todas las ordenes
+            orders = Order.objects.all()
+            #pido la primera orden para sacarle el id e identificarla
+            id_primera_orden = orders.first().id
+            #le saco el id a cada orden en donde se consulte el total usd
+            index = self.id
+            print(f'{index} {id_primera_orden}')
+            #condicional que comprueba si es la primera orden debe crear un registro de dolar, sino tomar ese registro creado y consultar el valor del dolar
+            if index == id_primera_orden:
+                print(f'{index} {id_primera_orden}')
+                valor_creado = ValueDolar.create_new_value()
+                dolita = valor_creado.value
+                print(dolita)
+            else:
+                ultimo_valor = ValueDolar.get_latest_value()
+                dolita = ultimo_valor
+                print(dolita)
+            
+            valor_bs = self.get_total
+            total_usd = valor_bs*dolita    
+            
+            return total_usd
         except ValueError as e:
             return {'error': 'no se pudo obtener el valor'}
         
