@@ -16,8 +16,8 @@ class ValueDolar(models.Model):
 
     @classmethod
     def get_latest_value(cls):
-        print()
-        return cls.objects.latest('date_time').value
+        print('latest_value')
+        return cls.objects.last()
 
     @classmethod
     def get_or_create_latest_value(cls):
@@ -49,28 +49,26 @@ class Order(models.Model):
     @property
     def get_total_usd(self):
         try:
-            #consulto todas las ordenes
-            orders = Order.objects.all()
-            #pido la primera orden para sacarle el id e identificarla
-            id_primera_orden = orders.first().id
-            #le saco el id a cada orden en donde se consulte el total usd
-            index = self.id
-            print(f'{index} {id_primera_orden}')
-            #condicional que comprueba si es la primera orden debe crear un registro de dolar, sino tomar ese registro creado y consultar el valor del dolar
-            if index == id_primera_orden:
-                print(f'{index} {id_primera_orden}')
+            print('hola')
+            ultimo_valor = ValueDolar.get_latest_value()
+            print(ultimo_valor)
+            # print(ultimo_valor.exists())
+            if ultimo_valor is None:
+                print('estoy en if')
                 valor_creado = ValueDolar.create_new_value()
-                dolita = valor_creado.value
-                print(dolita)
+                valor_consultado = valor_creado.value
+                print(valor_consultado)
+            elif ultimo_valor is None: 
+                print('el valor es ninguno')
+                valor_creado = ValueDolar.create_new_value()
+                valor_consultado = valor_creado.value
+                print(ultimo_valor.exists())
             else:
-                ultimo_valor = ValueDolar.get_latest_value()
-                dolita = ultimo_valor
-                print(dolita)
+                print('estoy en else')
+                valor_consultado = ValueDolar.get_latest_value().value
+                print(valor_consultado)
             
-            valor_bs = self.get_total
-            total_usd = valor_bs*dolita    
-            
-            return total_usd
+            return ultimo_valor
         except ValueError as e:
             return {'error': 'no se pudo obtener el valor'}
         
