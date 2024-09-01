@@ -50,25 +50,24 @@ class Order(models.Model):
     def get_total_usd(self):
         try:
             print('hola')
-            ultimo_valor = ValueDolar.get_latest_value()
-            print(ultimo_valor)
+            ultimo_objeto = ValueDolar.get_latest_value()
+            print(ultimo_objeto)
             # print(ultimo_valor.exists())
-            if ultimo_valor is None:
+            if ultimo_objeto is None or ultimo_objeto.date_time < datetime.now().date():
                 print('estoy en if')
-                valor_creado = ValueDolar.create_new_value()
-                valor_consultado = valor_creado.value
-                print(valor_consultado)
-            elif ultimo_valor is None: 
-                print('el valor es ninguno')
-                valor_creado = ValueDolar.create_new_value()
-                valor_consultado = valor_creado.value
-                print(ultimo_valor.exists())
+                usd_register_current = ValueDolar.create_new_value()
+                usd_value_current = usd_register_current.value
+                value_bs = self.get_total
+                total_usd = value_bs * usd_value_current
+                print(total_usd)
             else:
                 print('estoy en else')
-                valor_consultado = ValueDolar.get_latest_value().value
-                print(valor_consultado)
+                usd_value_current = ultimo_objeto.value
+                value_bs = self.get_total
+                total_usd = value_bs * usd_value_current
+                print(total_usd)
             
-            return ultimo_valor
+            return total_usd
         except ValueError as e:
             return {'error': 'no se pudo obtener el valor'}
         
